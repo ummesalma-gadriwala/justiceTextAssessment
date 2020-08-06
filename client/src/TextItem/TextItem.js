@@ -10,7 +10,6 @@ function TextItem(props) {
         return ""
     }
 
-
   return (
       <span className={getHighlight()} contentEditable={true} suppressContentEditableWarning={true}>
         {props.data.text}{" "}

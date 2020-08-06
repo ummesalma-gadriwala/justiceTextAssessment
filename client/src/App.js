@@ -13,6 +13,15 @@ function App() {
   const [value, setValue] = useState(0)
   const [searchInput, setSearchInput] = useState("")
 
+  /** DO NOT CHANGE THE FUNCTION BELOW */
+  useEffect(() => {
+    setInterval(() => {
+      // Find random bucket of words to highlight
+      setValue(Math.floor(Math.random() * 10))
+    }, INTERVAL_TIME)
+  }, [])
+  /** DO NOT CHANGE THE FUNCTION ABOVE */
+
   useEffect(() => {
     const fetchData = async () => {
       let response = await fetch("/api/dataIdList?datasize=" + DATA_SIZE_FULL)
@@ -27,13 +36,6 @@ function App() {
     fetchData()
   }, [])
 
-  useEffect(() => {
-    setInterval(() => {
-      // Find random bucket of words to highlight
-      setValue(Math.floor(Math.random() * 10))
-    }, INTERVAL_TIME)
-  }, [])
-
   const handleChange = e => {
     setSearchInput(e.target.value)
   }
@@ -41,18 +43,20 @@ function App() {
   return (
     <div className="App">
       <h2>JT Online Book</h2>
-      <div><input type="text" placeholder="Search text" value={searchInput} onChange={handleChange}/></div>
+      <div>
+        <input type="text" placeholder="Search text" value={searchInput} onChange={handleChange}/>
+      </div>
      {
        data.map((row, i) => {
-        return (<p key={"p" + i}>
+        return (<p key={`p${i}`}>
           {row.map((textitem, j) => {
             if (searchInput.length > 0 && textitem.text.search(searchInput) === -1) {
-              return;
+              return null;
             }
 
             return (
             <>
-              <TextItem key={i + "-" + j} value={value} data={textitem}/>
+              <TextItem key={`${i}${j}`} value={value} data={textitem}/>
             </>)
           })}
         </p>)
