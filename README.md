@@ -2,7 +2,7 @@
 
 Thank you so much for your interest in joining JusticeText. Please read the instructions below before you start the assessment.
 
-To begin the assessment, you will need to download the associated files in this repo and ensure you have node installed on your machine. This repo contains code for a start application that you will be improving as part of this assessment. The server file is written in Node.js and the frontend utilizies React.js.
+To begin the assessment, you will need to download the associated files in this repo and ensure you have node installed on your machine. This repo contains code for a starter application that you will be improving as part of this assessment. The server file is written in Node.js and the frontend utilizies React.js.
 
 ## Install Node
 
@@ -16,7 +16,7 @@ Get the starter code for this assessment on your machine by cloning or downloadi
   
 ## Starting the application
 
-Once you have all of the the dependencies loaded, you can run both the server and frontend simultaneously by running:
+Once you have all of the dependencies loaded, you can run both the server and frontend simultaneously by running:
 
 ### `yarn dev`
 
