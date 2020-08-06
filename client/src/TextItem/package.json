@@ -1,0 +1,7 @@
+{
+    "name": "TextItem",
+    "version": "0.0.0",
+    "private": true,
+    "main": "./TextItem.js"
+  }
+  

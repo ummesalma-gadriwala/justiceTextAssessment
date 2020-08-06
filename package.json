@@ -1,0 +1,32 @@
+{
+  "name": "justicetextassessment",
+  "version": "1.0.0",
+  "description": "Technical assessment for engineers interested in creating a more equitable U.S. justice system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "cd client && yarn start",
+    "server": "nodemon index.js",
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teamJusticeText/justiceTextAssessment.git"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "react",
+    "assessment",
+    "justicetext"
+  ],
+  "author": "JusticeText",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/teamJusticeText/justiceTextAssessment/issues"
+  },
+  "homepage": "https://github.com/teamJusticeText/justiceTextAssessment#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
