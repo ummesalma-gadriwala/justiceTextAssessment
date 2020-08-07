@@ -10,7 +10,7 @@ Follow the instructions on the [Node.js official site](https://nodejs.org/en/dow
 
 ## Clone or download this repo
 
-Get the starter code for this assessment on your machine by cloning or downloading the contents of this repository. From there, if you are using yarn, you can run the following command to load the dependencies you need to run the starter application.
+Get the starter code for this assessment on your machine by cloning or downloading the contents of this repository. From there, if you are using yarn, you can run the following command to load the dependencies you need to run the starter application. Run the following command for both the server and the client.
 
 ### `yarn install`
   
