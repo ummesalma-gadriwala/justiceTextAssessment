@@ -1,134 +1,126 @@
+// AUTHOR: UMME SALMA GADRIWALA
+
+// Approach: 
+// Added an infinite scroll component using the 'react-infinite-scroll-component'.
+// The page loads two paragraphs at a time and reloads when the user scrolls to the bottom of the screen.
+// Further modifications were made in App.css to include some beautifying elements.
+
 import React, { useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import TextItem from './TextItem'
 import './App.css';
 
 // const DATA_SIZE_HALF = "half"
 const DATA_SIZE_FULL = "full"
-const INTERVAL_TIME = 2000
+const INTERVAL_TIME = 2000;
 // Number of paragraphs to fetch in each refresh
-const DATA_ITEMS_PER_REFRESH = 2
-
+const DATA_ITEMS_PER_REFRESH = 2;
+let TOTAL_DATA_SIZE = 0;
+let ID_LIST = [];
 
 /** Application entry point */
 function App() {
 
-  const [data, setData] = useState([])
-  // const [count, setCount] = useState(1)
-  // const [gotID, setGotID] = useState([])
-  // const [pendingID, setPendingID] = useState([])
-  const [isFetching, setIsFetching] = useState(false);
-  const [value, setValue] = useState(0)
-  const [searchInput, setSearchInput] = useState("")
+    // count: maintains the count of the number of paragraphs loaded onto the page.
+    const [count, setCount] = useState(0);
+    const [data, setData] = useState([]);
+    const [value, setValue] = useState(0);
+    const [searchInput, setSearchInput] = useState("");
+    // isFetching: while isFetching is true, there is more data to load from the server.
+    const [isFetching, setIsFetching] = useState(true);
 
-  let gotID = []
-  let pendingID = []
+    /** DO NOT CHANGE THE FUNCTION BELOW */
+    useEffect(() => {
+        setInterval(() => {
+            // Find random bucket of words to highlight
+            setValue(Math.floor(Math.random() * 10))
+        }, INTERVAL_TIME)
+    }, [])
+    /** DO NOT CHANGE THE FUNCTION ABOVE */
 
-  
-  /** DO NOT CHANGE THE FUNCTION BELOW */
-  useEffect(() => {
-    setInterval(() => {
-      // Find random bucket of words to highlight
-      setValue(Math.floor(Math.random() * 10))
-    }, INTERVAL_TIME)
-  }, [])
-  /** DO NOT CHANGE THE FUNCTION ABOVE */
+    useEffect(() => {
+        // fetchData first calls the dataIdList API to find the total number of paragraphs.
+        // Then requests data for the first two paragraphs.
+        const fetchData = async () => {
+            let response = await fetch("/api/dataIdList?datasize=" + DATA_SIZE_FULL)
+            let list = await response.json()
+            TOTAL_DATA_SIZE = list.length;
+            ID_LIST = list
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+            let nextDataId = list.slice(count, count + DATA_ITEMS_PER_REFRESH) //[0,1]
 
-  useEffect(() => {
-    if (!isFetching) return;
-    fetchMoreData();
-  }, [isFetching]);
+            let dataItems = await Promise.all(nextDataId.map(async id => {
+                return (await fetch("/api/dataItem/" + id)).json()
+            }))
+            setData(dataItems)
+            setCount(count + DATA_ITEMS_PER_REFRESH)
+        }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      let dataID = await getDataID() //[0,1,2,3,4,5...89]
-      let refreshDataID = dataID.slice(0,DATA_ITEMS_PER_REFRESH) //[0,1]
-      console.log("ffff", dataID)
-      
-      let dataItems = await Promise.all (refreshDataID.map(async id => {
-        return (await fetch("/api/dataItem/" + id)).json()
-      }))
+        fetchData()
+    }, [])
 
-      setData(dataItems)
-      gotID = refreshDataID
-      pendingID = dataID.slice(DATA_ITEMS_PER_REFRESH)
-      // setGotID(refreshDataID) // [0,1]
-      // setCount(count+1)
-      // setPendingID(dataID) // [2,3,4,5,...89]
+    // fetchMoreData is called each time the user scrolls to the end of the page.
+    // Performs a check to see if all the data from the server is loaded. If so, it sets isFetching to false and exits.
+    // Otherwise, it loads the next two paragraphs onto the page.
+    const fetchMoreData = async () => {
+        // console.log("TOTAL_DATA_SIZE 1", TOTAL_DATA_SIZE, ID_LIST, count)
+        if (count === TOTAL_DATA_SIZE) {
+            setIsFetching(false)
+            return
+        }
 
-      console.log("refreshDataID, dataID", gotID, pendingID)
+        let nextDataId = ID_LIST.slice(count, count + DATA_ITEMS_PER_REFRESH) //[2,3]
+
+        let dataItems = await Promise.all(nextDataId.map(async id => {
+            return (await fetch("/api/dataItem/" + id)).json()
+        }))
+
+        setData(dataItems.concat(data))
+        setCount(count + DATA_ITEMS_PER_REFRESH)
+        // console.log("TOTAL_DATA_SIZE 2", TOTAL_DATA_SIZE, ID_LIST, count)
+    }
+
+    const handleChange = e => {
+        setSearchInput(e.target.value)
     }
     
-    fetchData()
-  }, [])
+    return (
+        <div className="App">
+            <img src="favicon.ico" alt="JusticeText"></img>
+            <h2>JT Online Book</h2>
 
-  function handleScroll() {
-    if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return;
-    setIsFetching(true)
-    console.log('Fetch more data items!');
-  }
+            <div className="search-box">
+                <input type="text" name="text" className="text" id="text-search" placeholder="Search text" value={searchInput} onChange={handleChange} />
+            </div>
 
-  const fetchMoreData = async() => {
-    let refreshDataID = pendingID.slice(0,DATA_ITEMS_PER_REFRESH) //[2,3]
-    let dataItems = await Promise.all (refreshDataID.map(async id => {
-      return (await fetch("/api/dataItem/" + id)).json()
-    }))
+            {/* Implemented an infinite scroll. */}
+            <div className="App">
+                <InfiniteScroll
+                    dataLength={data.length}
+                    next={fetchMoreData}
+                    hasMore={isFetching}
+                    loader={<h4>Loading data...</h4>}
+                    endMessage={<p>======</p>}
+                >
+                    {data.map((row, i) => {
+                        return (
+                            <p key={`p${i}`}>
+                                {row.map((textitem, j) => {
+                                    if (searchInput.length > 0 && textitem.text.search(searchInput) === -1) {
+                                        return null;
+                                    }
 
-    setData(dataItems)
-    gotID = gotID.concat(refreshDataID)
-    pendingID = pendingID.slice(DATA_ITEMS_PER_REFRESH)
-    // setGotID(gotID.concat(refreshDataID)) // [0,1,2,3]
-    // setCount(count+1)
-    // setPendingID(pendingID.slice(DATA_ITEMS_PER_REFRESH))
-    setIsFetching(false)
-
-    console.log("gotID, pendingID", gotID, pendingID)
-  }
-
-    const getDataID = async () => {
-    let response = await fetch("/api/dataIdList?datasize=" + DATA_SIZE_FULL)
-    let list = await response.json()
-    
-    return list//.slice(0,DATA_ITEMS_PER_REFRESH*count)
-  }
-
-  const handleChange = e => {
-    setSearchInput(e.target.value)
-  }
-
-  // Infinite scroll that only loads the paragraphs currently on the screen
-
-  return (
-    <div className="App">
-      <h2>JT Online Book</h2>
-      {/* <h3>{dataList.length}</h3> */}
-      <div>
-        <input type="text" placeholder="Search text" value={searchInput} onChange={handleChange}/>
-      </div>
-
-     {
-       data.map((row, i) => {
-        return (<p key={`p${i}`}>
-          {row.map((textitem, j) => {
-            if (searchInput.length > 0 && textitem.text.search(searchInput) === -1) {
-              return null;
-            }
-
-            return (
-            <>
-              <TextItem key={`${i}${j}`} value={value} data={textitem}/>
-            </>)
-          })}
-        </p>)
-       })
-     }
-     {isFetching && 'Fetching more data items...'}
-    </div>
-  );
+                                    return (
+                                        <TextItem key={`${i}${j}`} value={value} data={textitem} />
+                                    )
+                                })}
+                            </p>
+                        )
+                    })}
+                </InfiniteScroll>
+            </div>
+        </div>
+    );
 }
 
 export default App;
