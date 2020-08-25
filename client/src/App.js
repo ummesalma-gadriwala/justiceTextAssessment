@@ -14,12 +14,15 @@ function App() {
 
   const [data, setData] = useState([])
   // const [count, setCount] = useState(1)
-  const [gotID, setGotID] = useState([])
-  const [pendingID, setPendingID] = useState([])
+  // const [gotID, setGotID] = useState([])
+  // const [pendingID, setPendingID] = useState([])
   const [isFetching, setIsFetching] = useState(false);
-  
   const [value, setValue] = useState(0)
   const [searchInput, setSearchInput] = useState("")
+
+  let gotID = []
+  let pendingID = []
+
   
   /** DO NOT CHANGE THE FUNCTION BELOW */
   useEffect(() => {
@@ -51,9 +54,11 @@ function App() {
       }))
 
       setData(dataItems)
-      setGotID(refreshDataID) // [0,1]
+      gotID = refreshDataID
+      pendingID = dataID.slice(DATA_ITEMS_PER_REFRESH)
+      // setGotID(refreshDataID) // [0,1]
       // setCount(count+1)
-      setPendingID(dataID) // [2,3,4,5,...89]
+      // setPendingID(dataID) // [2,3,4,5,...89]
 
       console.log("refreshDataID, dataID", gotID, pendingID)
     }
@@ -74,12 +79,14 @@ function App() {
     }))
 
     setData(dataItems)
-    setGotID(gotID.concat(refreshDataID)) // [0,1,2,3]
+    gotID = gotID.concat(refreshDataID)
+    pendingID = pendingID.slice(DATA_ITEMS_PER_REFRESH)
+    // setGotID(gotID.concat(refreshDataID)) // [0,1,2,3]
     // setCount(count+1)
-    setPendingID(pendingID.slice(DATA_ITEMS_PER_REFRESH))
+    // setPendingID(pendingID.slice(DATA_ITEMS_PER_REFRESH))
     setIsFetching(false)
 
-    console.log("gotID, count, pendingID", gotID, pendingID)
+    console.log("gotID, pendingID", gotID, pendingID)
   }
 
     const getDataID = async () => {
